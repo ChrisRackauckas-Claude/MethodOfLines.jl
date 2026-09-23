@@ -1,3 +1,6 @@
+using MethodOfLines, OrdinaryDiffEq, DomainSets, ModelingToolkit, Test, SciMLBase
+using DiffEqBase: BrownFullBasicInit
+
 @testset "Complex-typed cubic NLS plane wave" begin
     @parameters t x
     @variables ψ(..)::Complex

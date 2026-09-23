@@ -60,8 +60,6 @@ using DiffEqBase: BrownFullBasicInit
     # gif(anim, "schroedinger.gif", fps = 10)
 end
 
-include("typed_nls.jl")
-
 @testset "Schroedinger with complex bcs" begin
     @parameters t, x
     @variables ψ(..)
