@@ -32,24 +32,21 @@ using DiffEqBase: BrownFullBasicInit
 
     prob = discretize(sys, disc)
 
-    sol = solve(prob; saveat = 0.01, initializealg = BrownFullBasicInit())
+    sol = solve(
+        prob; saveat = 0.01, initializealg = BrownFullBasicInit(), reltol = 1.0e-10,
+        abstol = 1.0e-10
+    )
 
     discx = sol[x]
     disct = sol[t]
 
     discψ = sol[ψ(t, x)]
 
-    analytic(t, x) = sqrt(2) * sin(2 * pi * x) * exp(-im * 4 * pi^2 * t) *
-        ((1 + im) / sqrt(2))
+    h = 1 / 99
+    λ₂ = 4 * sinpi(h)^2 / h^2
+    analψ = [ψ0(x) * exp(im * λ₂ * t) for t in disct, x in discx]
 
-    analψ = [analytic(t, x) for t in disct, x in discx]
-
-    for i in 1:length(disct)
-        u = abs.(analψ[i, :]) .^ 2
-        u2 = abs.(discψ[i, :]) .^ 2
-
-        @test u ./ maximum(u) ≈ u2 ./ maximum(u2) atol = 1.0e-2
-    end
+    @test discψ ≈ analψ atol = 1.0e-6 rtol = 0
     #using Plots
 
     # anim = @animate for i in 1:length(disct)

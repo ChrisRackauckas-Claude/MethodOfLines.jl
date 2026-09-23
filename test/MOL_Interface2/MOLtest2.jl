@@ -520,11 +520,8 @@ end
     sol = solve(prob; saveat = s_in_y)
 end
 
-# Complex PDE equation/unknown counting: MTK v11 splits complex equations into
-# real/imaginary parts creating 2 equations for 1 unknown. This needs a fix in
-# MOL's interior_map.jl to properly handle complex variable splitting.
 @testset "Schroedinger Equation" begin
-    @test_broken begin
+    @test begin
         @parameters x z
         @variables A(..)
         Dx = Differential(x)
