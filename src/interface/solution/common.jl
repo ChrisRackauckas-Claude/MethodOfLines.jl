@@ -1,4 +1,8 @@
 function _pde_call(sol, args...; dv = nothing)
+    if dv isa Complex{Num}
+        dv = only(arguments(Symbolics.unwrap(real(dv))))
+    end
+
     # Colon reconstructs on gridpoints
     args = map(enumerate(args)) do (i, arg)
         if arg isa Colon
@@ -23,7 +27,7 @@ function _pde_call(sol, args...; dv = nothing)
     end
     if iscomplex(sol) && !any(isequal(safe_unwrap(dv)), sol.dvs)
         symargs = arguments(safe_unwrap(dv))
-        redv, imdv = sol.disc_data_complexmap[dv]
+        redv, imdv = sol.disc_data.complexmap[operation(safe_unwrap(dv))]
         return sol.interp[Num(redv(symargs...))](args...) .+
             im * sol.interp[Num(imdv(symargs...))](args...)
     else
@@ -79,9 +83,21 @@ Base.@propagate_inbounds function Base.getindex(
 end
 
 Base.@propagate_inbounds function Base.getindex(
+        A::SciMLBase.PDETimeSeriesSolution{T, N, S, D}, sym::Complex{Num}
+    ) where {T, N, S, D <: MOLMetadata}
+    return _pde_getindex(A, only(arguments(Symbolics.unwrap(real(sym)))))
+end
+
+Base.@propagate_inbounds function Base.getindex(
         A::SciMLBase.PDENoTimeSolution{T, N, S, D}, sym::Union{Num, Symbol}
     ) where {T, N, S, D <: MOLMetadata}
     return _pde_getindex(A, sym)
+end
+
+Base.@propagate_inbounds function Base.getindex(
+        A::SciMLBase.PDENoTimeSolution{T, N, S, D}, sym::Complex{Num}
+    ) where {T, N, S, D <: MOLMetadata}
+    return _pde_getindex(A, only(arguments(Symbolics.unwrap(real(sym)))))
 end
 
 function _pde_getindex(A, sym, args...)

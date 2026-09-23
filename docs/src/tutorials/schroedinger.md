@@ -6,7 +6,7 @@ MethodOfLines can solve linear complex PDEs like the Schrödinger equation:
 using MethodOfLines, OrdinaryDiffEq, Plots, DomainSets, ModelingToolkit
 
 @parameters t, x
-@variables ψ(..)
+@variables ψ(..)::Complex
 
 Dt = Differential(t)
 Dxx = Differential(x)^2
@@ -46,6 +46,8 @@ end
 gif(anim, "schroedinger.gif", fps = 10)
 ```
 
-Note that complex initial conditions are supported, but must be marked with a `=>` operator.
+Declare complex fields with `::Complex` so Symbolics keeps `conj`, `real`, and
+`imag` symbolic when constructing the PDE. Complex initial conditions must be
+marked with a `=>` operator.
 
 This represents the second from ground state of a particle in an infinite quantum well, try changing the potential `V(x)`, initial conditions and BCs, it is extremely interesting to see how the wave function evolves even for nonphysical combinations. Be sure to post interesting results on the discourse!

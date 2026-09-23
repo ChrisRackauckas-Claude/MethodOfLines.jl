@@ -23,11 +23,13 @@
             name = :typed_nls
         )
         prob = discretize(sys, disc)
-        sol = solve(prob; reltol = 1e-11, abstol = 1e-11, saveat = T / 2,
-            initializealg = BrownFullBasicInit())
+        sol = solve(
+            prob; reltol = 1.0e-11, abstol = 1.0e-11, saveat = T / 2,
+            initializealg = BrownFullBasicInit()
+        )
         exact = A .* exp.(im .* (k .* sol[x] .- ω * T))
         @test SciMLBase.successful_retcode(sol)
-        @test maximum(abs.(sol[ψ(t, x)][end, :] .- exact)) < 1e-10
-        @test maximum(abs.(sol(T, sol[x]; dv = z) .- exact)) < 1e-10
+        @test maximum(abs.(sol[ψ(t, x)][end, :] .- exact)) < 1.0e-10
+        @test maximum(abs.(sol(T, sol[x]; dv = z) .- exact)) < 1.0e-10
     end
 end
