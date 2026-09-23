@@ -1,6 +1,6 @@
-# MethodOfLines.jl 1.6
+# MethodOfLines.jl 2.0
 
-## Array-valued unknowns
+## Breaking changes
 
 The system returned by `symbolic_discretize` now has one unknown per dependent variable:
 the array variable `u(t)[1:n, 1:m]` rather than one scalar unknown per grid point.
@@ -8,10 +8,13 @@ the array variable `u(t)[1:n, 1:m]` rather than one scalar unknown per grid poin
 index cache and the initialization bookkeeping built from it. The discrete elements
 `u(t)[i, j]` still index into these arrays and remain what the discretized equations,
 boundary conditions and initial conditions are written in terms of, so
-`get_discrete(pdesys, disc)`, `sol[u(t, x)]` and `sol(t, x)` are unchanged.
+`get_discrete(pdesys, disc)`, `sol[u(t, x)]` and `sol(t, x)` are unchanged, as are the
+state vectors of the problems `discretize` and `DAEProblem(pdesys, disc)` build.
 
-Code that inspects `unknowns(sys)` expecting scalar grid values must scalarize the array
-unknowns first, or use `mtkcompile(sys)`, which still scalarizes them.
+This is breaking for code that enumerates `unknowns(sys)` of the symbolically discretized
+system expecting scalar grid values, for example to build an operating point or to
+filter unknowns by name. Such code must scalarize the array unknowns first
+(`Symbolics.scalarize`), or work on `mtkcompile(sys)`, which still scalarizes them.
 
 This requires `PDEBase` 0.1.37 and `ModelingToolkitBase` 1.72.
 
