@@ -16,7 +16,7 @@ system expecting scalar grid values, for example to build an operating point or 
 filter unknowns by name. Such code must scalarize the array unknowns first
 (`Symbolics.scalarize`), or work on `mtkcompile(sys)`, which still scalarizes them.
 
-This requires `PDEBase` 0.1.37 and `ModelingToolkitBase` 1.72.
+This requires `PDEBase` 0.1.38 and `ModelingToolkitBase` 1.72.
 
 # MethodOfLines.jl 1.0
 
