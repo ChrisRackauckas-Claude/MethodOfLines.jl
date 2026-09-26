@@ -84,6 +84,9 @@ run_tests(;
             @safetestset "Complex-typed cubic NLS plane wave" begin
                 include(joinpath(@__DIR__, "Complex", "typed_nls.jl"))
             end
+            @safetestset "Complex-typed stationary solution indexing" begin
+                include(joinpath(@__DIR__, "Complex", "typed_stationary_indexing.jl"))
+            end
             return @safetestset "Inferred-complex solution indexing" begin
                 include(joinpath(@__DIR__, "Complex", "inferred_complex_indexing.jl"))
             end

@@ -34,5 +34,10 @@ using DiffEqBase: BrownFullBasicInit
         @test SciMLBase.successful_retcode(sol)
         @test maximum(abs.(sol[ψ(t, x)][end, :] .- exact)) < 1.0e-10
         @test maximum(abs.(sol(T, sol[x]; dv = z) .- exact)) < 1.0e-10
+        # Transformed Complex{Num} keys must not silently alias the field.
+        @test_throws ErrorException sol[conj(z)]
+        @test_throws ErrorException sol[real(z) - 2im * imag(z)]
+        @test_throws ErrorException sol(T, sol[x]; dv = conj(z))
+        @test_throws ErrorException sol(T, sol[x]; dv = real(z) - 2im * imag(z))
     end
 end
