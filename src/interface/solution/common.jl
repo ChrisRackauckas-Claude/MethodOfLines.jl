@@ -1,6 +1,21 @@
+# Typed complex fields are Complex{Num} of the form real(u(...)) + im*imag(u(...)).
+# Reject conjugates and other transformed keys that share only the real component.
+function _canonical_complex_dv(key::Complex{Num})
+    re = Symbolics.unwrap(real(key))
+    if !(iscall(re) && operation(re) === real)
+        error("Invalid indexing of solution. $key is not a canonical complex dependent variable.")
+    end
+    inner = only(arguments(re))
+    canonical = Complex(Num(real(inner)), Num(imag(inner)))
+    isequal(key, canonical) || error(
+        "Invalid indexing of solution. $key is not a canonical complex dependent variable."
+    )
+    return inner
+end
+
 function _pde_call(sol, args...; dv = nothing)
     if dv isa Complex{Num}
-        dv = only(arguments(Symbolics.unwrap(real(dv))))
+        dv = _canonical_complex_dv(dv)
     end
 
     # Colon reconstructs on gridpoints
@@ -85,7 +100,7 @@ end
 Base.@propagate_inbounds function Base.getindex(
         A::SciMLBase.PDETimeSeriesSolution{T, N, S, D}, sym::Complex{Num}
     ) where {T, N, S, D <: MOLMetadata}
-    return _pde_getindex(A, only(arguments(Symbolics.unwrap(real(sym)))))
+    return _pde_getindex(A, _canonical_complex_dv(sym))
 end
 
 Base.@propagate_inbounds function Base.getindex(
@@ -97,7 +112,7 @@ end
 Base.@propagate_inbounds function Base.getindex(
         A::SciMLBase.PDENoTimeSolution{T, N, S, D}, sym::Complex{Num}
     ) where {T, N, S, D <: MOLMetadata}
-    return _pde_getindex(A, only(arguments(Symbolics.unwrap(real(sym)))))
+    return _pde_getindex(A, _canonical_complex_dv(sym))
 end
 
 function _pde_getindex(A, sym, args...)
